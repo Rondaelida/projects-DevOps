@@ -1,0 +1,60 @@
+stages:
+  - build
+  - style 
+  - test
+  - deploy
+
+build-job:
+  stage: build 
+  tags: 
+    - build 
+  script:
+    - cd src/C3_SimpleBashUtils/cat
+    - make 
+    - cd ../grep 
+    - make
+  artifacts:
+    paths:
+      - src/C3_SimpleBashUtils/cat/s21_cat
+      - src/C3_SimpleBashUtils/grep/s21_grep
+    expire_in: 30 days
+  after_script:
+    - bash notify.sh
+
+style:
+  stage: style 
+  tags: 
+    - style 
+  script:
+    - cd src/C3_SimpleBashUtils/cat
+    - make clang_check
+    - cd ../grep 
+    - make clang_check
+  after_script:
+    - bash notify.sh
+
+test:
+  stage: test
+  tags:
+    - test
+  script:
+    - cd src/C3_SimpleBashUtils/cat
+    - make test
+    - cd ../grep 
+    - make test
+  rules:
+    - when: on_success
+  after_script:
+    - bash notify.sh
+
+deploy: 
+  stage: deploy
+  tags:
+    - deploy 
+  script:
+    - sudo chmod +x ./deploy.sh
+    - bash deploy.sh
+  rules:
+    - when: on_success
+  after_script:
+    - bash notify.sh

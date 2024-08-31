@@ -1,0 +1,4 @@
+clean:
+	./s21_grep "clean" Makefile > sausage.txt
+	grep "clean" Makefile > sausage2.txt
+rebuild: all clean
